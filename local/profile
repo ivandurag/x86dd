@@ -1,0 +1,61 @@
+:
+
+# Setup PATH
+PATH="/bin:/usr/bin:/usr/local/bin:${HOME:=/usr/local/vm0}/bin:."
+export PATH
+
+# Setup prompt
+if [ "X${BASH}" = X ]; then
+  # SH prompt
+  PS1="[${VMNAME:-singleuser}] $ "
+else
+  # BASH prompt
+  PS1="[${VMNAME:-singleuser}: \w] \$ "
+fi
+export PS1
+
+# Display welcome message
+echo
+echo "Welcome to LynxOS-178${UID:+ (VM${UID})}${SYSMODE:+ (${SYSMODE} mode)}"
+
+if [ ${UID} = 0 ]; then
+  /bin/rc
+fi
+
+echo "
+=======================================================================
+KDI:          developer.kdi - Basic funcionality of LynxOS-178
+
+SYNOPSIS:     This KDI contains the following features:
+		o Contains disk formatting and partitioning tools.
+		o Allows extraction of tar images.
+		o Provides simple shell.
+		o Provides SKDB.
+		o Luminosity, LOCI, and Spyker target support.
+
+REQUIREMENTS: In order to use all features of this kdi the following
+		requirements must be met:
+		o You must have an attached disk to use disk utilities.
+
+SETUP:		o On the target board, boot the KDI and log in as root.
+		o For rlogin, rsh and irsh access please edit /etc/hosts
+		  or configure resolv.conf with appropriate
+		  information for cross development host.
+		o For FTP access to the target use:
+			user:ftp
+			password:ftp_user
+		o For Luminosity access to the target use:
+			user:vl
+			password:vl_user
+
+REFERENCE:    Please see the LynxOS-178 manual pages
+=======================================================================
+"
+if [ ! -f /tmp/.profilelock ]; then
+  :> /tmp/.profilelock
+  /bin/mkdir /tmp/vl
+  /bin/chown vl /tmp/vl
+  /bin/chmod 755 /tmp/vl
+  /bin/mkdir /tmp/root
+  /bin/chmod 755 /tmp/root
+fi

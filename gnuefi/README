@@ -1,0 +1,34 @@
+# vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+# vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+#****************************************************************************
+# (C) Copyright 2022 Lynx Software Technologies, Inc. All rights reserved.
+#****************************************************************************
+
+gnuefi
+======
+
+Prerequisites to build:
+----------------------
+- gnu-efi headers
+
+- gnu-efi libs:
+    libefi.a
+    libgnuefi.a
+
+- other dependency:
+    crt0-efi-$(ARCH).o
+    elf_$(ARCH)_efi.lds
+
+- Update paths of above prerequisites to Makefile variables
+  EFIINC, EFILIB, LIB
+
+To build gnu-efi from sources:
+
+ $ git clone https://git.code.sf.net/p/gnu-efi/code gnu-efi
+ $ cd gnu-efi
+ $ make
+
+To install gnu-efi and headers on CentOS:
+
+ $ sudo yum install gnu-efi gnu-efi-devel
+

@@ -1,0 +1,23 @@
+# vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+# vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+#****************************************************************************
+# (C) Copyright 2019-2023 Lynx Software Technologies, Inc. All rights reserved.
+#****************************************************************************
+
+dnl #This file is processed by the m4 macro processor.
+
+changequote(",")
+
+ifelse(BUILD_MODE, DEVELOPMENT,"
+C:LCS Driver:\
+	:::ioerr_st:ioerr_st:\
+	:ioerr:lcs_ioctl:lcs_install:lcs_uninstall
+","
+C:LCS Driver:\
+	:::ioerr_st:ioerr_st:\
+	:ioerr:lcs_ioctl:lcs_install:ioerr
+")
+
+# The device and nodes for a lcs device
+D:LCS Device:lcs_config::
+N:lcs0:0:0666

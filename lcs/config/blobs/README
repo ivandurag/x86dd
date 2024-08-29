@@ -1,0 +1,54 @@
+Blobs allow building one KDI to be used with multiple Subjects.
+Please see section 4.2 of the LCS User's Guide for more information on blobs.
+
+Each Subject in a blob will have 3 files:
+
+1) VCT.<Subject> this originates from the VCT file under sys/bsp.<bsp_name>
+as "VCT.fvlos178-lcsconf-example". The bsp_name is the BSP name as x86_64 
+or ls1028a as example
+
+2) <Subject>.spec.in as "fvlos178-lcsconf-example.spec.in" allows the user 
+to add files to the Subject file system and can be acesses from the path 
+/usr/local when Subject boots. The target field is required as example as
+
+	For x86, target=x86_64
+	For arm, target=aarch_64
+
+3) <Subject>.c this is the equivalent of lcsinfo.c that houses the networking
+stack interface configuration as fvlos178-lcsconf-example.c
+
+In this directory the user can create multiple blobs to build images for
+different hardware platform. These blobs can scale, one can create a new
+blob directory and call it "xyz". It doesn't have to be in the form
+ "blob_dev_x86_64",  blob here is provided as an example.
+
+To create a new blob, create a new directory and copy an existing blob to it.
+Change Subject names as desired. Add remove Subjects as needed.
+
+To build a blob run :
+$ build.sh <blob directory name>
+
+as example as
+
+$ build.sh ./blob_dev_x86_64
+
+
+NOTE the string "blobs" in the path sys/drivers.rsc/lcs/config/blobs
+doesn't change. The blob name under it such as "blob_dev_x86_64" can be
+named to any name.
+
+There is a README inside the blob to illustrate how one can create an SRP 
+scrip under LynxSecure and refere to the Subject image under the blob's path. 
+
+The files under subject_files inside the blob are dummy files and used only 
+for illustration on how ot package certain files per Subject. The <Subject>.spec.in
+files inside the blob have reference to the subject_files directory show how to 
+package the files.
+
+The file lcsinfo_test.h under a blob includes the IP/MAC address pair of LynxOS-178
+Subject. This will be used by the networking stack as an arp cache to lookup MAC address
+of an IP address. This file eases the inclusion of a long list of IP/MAC pairs in the 
+<Subject>.c files by referening only the string that defines the entire list:
+.ip2macPeers = PEERS_TABLE
+
+User can change this header file as desired and it is provided as an example.

@@ -1,0 +1,22 @@
+target=x86_64
+
+directory=/
+file=lcsconfig.img source=$(ENV_PREFIX)/sys/drivers.rsc/lcs/config/blobs/BLOBS/img/LCSBLOB owner=0 group=0 mode=-rw-r--r--
+
+directory=/etc
+ file=VCT source=$(ENV_PREFIX)/sys/drivers.rsc/lcs/config/blobs/BLOBS/LCSVCT owner=0 group=0 mode=-rw-r--r--
+
+# To package files that pertain to certain Subject add them for instance
+# under directory subject_files or make a new directory, then list the 
+# required files per Subject. Each Subject can include different set of 
+# files, this will reduce the SRP image size opposed to adding unwanted files 
+# to Subjects. 
+# Pay attention to file permessions in order to be able to execute it.
+# Below files were added as an example, the files file_1,...,file_10 are dummy.
+#directory=/binaries
+# file=file_7 source=subject_files/file_7 owner=0 group=0 mode=-rw-r--r--
+# file=file_8 source=subject_files/file_8 owner=0 group=0 mode=-rw-r--r--
+
+#directory=/tst                                  owner=0 group=0 mode=drwxrwxrwx
+# file=tst_socks      source=$(ENV_PREFIX)/bin/tst_socks     owner=0 group=0 mode=-r-xr-xr-x
+# file=network_24hrs  source=$(ENV_PREFIX)/bin/network_24hrs    owner=0 group=0 mode=-r-xr-xr-x

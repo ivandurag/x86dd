@@ -1,0 +1,242 @@
+# vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+# vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+#****************************************************************************
+# (C) Copyright 2014-2024 Lynx Software Technologies, Inc. All rights reserved.
+# (C) Copyright 2000-2014 LynuxWorks, Inc. All rights reserved.
+# (C) Copyright 1999-2000 Lynx Real-Time Systems, Inc. All rights reserved.
+#****************************************************************************
+
+OS_NAME			= lynxos-178
+SPEC_NAME		= $(OS_NAME).spec
+KDI_NAME		= $(OS_NAME).kdi
+RAW_KDI			= $(OS_NAME).raw
+EFI_IMG			= $(OS_NAME).efi
+MKIMAGE_SPEC	= $(SPEC_NAME)
+MKIMAGE_KDI		= $(KDI_NAME)
+IMG_PATH		= $(abspath $(OS_NAME))
+IMG_EXTN		= .kdi
+LIB			= $(INSTALL_DIR_SYS_LIB)
+CONF_FILE	= conf.c
+INFO_FILE	= info.c
+CONF_AM_FILE	= conf_am.c
+
+KERN_CFLAGS += $(BSP_CFLAGS) $(BSP_SPECIAL_CFLAGS) \
+		-D__LYNXOS178_RELEASE="\"$(LYNXOS178_RELEASE)\"" \
+		-D__LYNXOS178_VERSION="\"$(LYNXOS178_VERSION)\"" \
+		-D__COPYRIGHT_YEAR="$(COPYRIGHT_YEAR)" \
+		-D__LYNXOS178_PLATFORM="\"$(PLATFORM)\""
+
+# Build information
+KERN_CFLAGS += -D__LYNXOS178_URL="\"$(LYNXOS178_URL)\""	\
+		-D__LYNXOS178_SHA="\"$(LYNXOS178_SHA)\"" \
+		-D__LYNXOS178_REV="\"$(LYNXOS178_REV)\"" \
+		-D__LYNXOS178_SP="\"$(LYNXOS178_SP)\""
+
+ifeq ($(CODE_COVERAGE_TYPE), obj)
+  CONF_FILE = inszt_conf.s
+  INFO_FILE	= inszt_info.s
+  CONF_AM_FILE = inszt_conf_am.s
+endif
+
+SPECIAL_INCLUDES	+= -I.
+KERN_LDFLAGS		+= -L$(LIB) -L$(GCC_LIB_PATH)
+DATE_STAMP			= `date`
+CONF_H				= $(ENV_PREFIX)/usr/include/conf.h
+CONF_FILES			= conf_am.x conf.x info.x
+CONF_OFILES			= $(CONF_FILES:.x=.o)
+KERN_LINK			+= -Ttext 0xffffffff80001000 -Map lynxos.map
+KERNEL				= -lkernel
+DRIVERS				= -ldrivers
+DRIVERS_RSC			= -ldrivers_rsc
+MISC				= -lmisc
+DRM					= -ldrm
+PTRACE				+= -lptrace
+
+DEPENDENCIES	= $(BSP_LIBRARIES) $(DRIVERS)
+DEPENDENCIES	+= $(DRIVERS_RSC) $(LCS) $(NFS_CLIENT)
+DEPENDENCIES	+= $(PTRACE) $(OTHER)
+# add user bits when in unikernel mode
+ifeq ($(BUILD_MODE), $(MODE_UNIKERNEL))
+  USERAPP			= -luserapp $(SPECIAL_LIBS)
+  DEPENDENCIES += -lc -lxnet
+endif
+
+# Makes --whole-archive and --no-whole-archive flags a little more readable.
+WA = --whole-archive
+NWA = --no-whole-archive
+
+# All libraries included in the device driver API.
+DRIVER_API_LIBS = $(KERNEL) $(MISC)
+
+# The --start-group and --end-group flags are used to mark a group of libraries
+# so that the group is repeatedly searched until all dependencies are resolved.
+# This eliminates the need for listing items more than once, but might slow
+# down linking a bit.  However, it is less of a maintenance problem than trying
+# to figure out the order of dependencies between all of the libraries.
+# The $(WA) and $(NWA) macros are used to force all objects in the archives
+# between those flags to be included, even if there are no references.  We do
+# this for the libraries needed for the device driver API.  This way, dynamic
+# device drivers will have the entire API available.  The $(WA) and $(NWA) macros
+# would not work within the --start-group/--end-group flags so they had to be
+# handled on a separate line.
+# Refer to PR-7770.
+#
+LIBLIST = --start-group $(DEPENDENCIES) $(DRM) \
+		$(WA) $(DRIVER_API_LIBS) $(USERAPP) $(NWA) --end-group
+
+OTHER_HEADERS = sysdevices.h CONFIG.h
+
+DRIVER_LIBS = $(LIB)/libdrivers.a $(LIB)/libdrivers_rsc.a
+
+COMMON_DEPS = $(OTHER_HEADERS) $(UPARAM_H) $(CONFIG_TBL) $(DRIVER_LIBS)
+
+common_all: $(COMMON_DEPS) a.out kdi
+
+__KERN_IFLAGS = $(KERN_IFLAGS)
+ifneq ($(BUILD_MODE), $(MODE_DEV))
+ifeq ($(CERTIFIED), true)
+__KERN_IFLAGS = $(KERN_IFLAGS_RSC)
+endif
+endif
+
+$(TIMESTAMP_OFILE):
+	@$(ECHO)
+	@$(ECHO) "Creating $@ ..."
+	@$(ECHO)
+	@$(ECHO) "Current date: $(DATE_STAMP)"
+	@$(ECHO) "const char lynx_timestamp[] = \"$(DATE_STAMP)\";" > timestamp.c
+	$(KERN_GCC) $(KERN_CFLAGS) $(__KERN_IFLAGS) -c timestamp.c -o $@
+	@$(RM) timestamp.c
+
+a.out: $(COMMON_DEPS) $(BSP) $(CONF_OFILES) $(TIMESTAMP_OFILE)
+	@$(ECHO)
+	@$(ECHO) "Linking kernel ..."
+	@$(ECHO)
+	$(KERN_LINK) -o $@ $(BSP) $(CONF_OFILES) $(TIMESTAMP_OFILE) \
+			$(LIBLIST) -rpath :
+ifneq ($(STRIP_DEBUG_SYMBOLS), no)
+	@$(ECHO)
+	@$(ECHO) "Stripping debug symbols ..."
+	@$(ECHO)
+	$(STRIP) --strip-debug $@
+	@$(ECHO)
+endif
+
+install: install_pdf
+
+prepare_bootable:
+ifeq ($(KDI_NAME), lynxos-178.kdi)
+	$(MAKE) -C ../x86_64_Debug bootable_img
+else
+	$(CP) ../x86_64_Debug/$(KDI_NAME) ../x86_64_Debug/lynxos-178.kdi
+	$(MAKE) -C ../x86_64_Debug bootable_img
+	$(RM) ../x86_64_Debug/lynxos-178.kdi
+endif
+
+# Build KDI.
+kdi: a.out nodetab $(STANDARD_VCTFILES) $(STANDARD_SPECFILES)
+	OSTEXT=$(OSTEXT) ELF=$(ELF) $(KERN_MKIMAGE) $(MKIMAGE_SPEC) \
+			$(MKIMAGE_KDI); \
+	$(CHMOD) 644 $(MKIMAGE_KDI);
+ifeq ($(THIS_BSP),$(filter $(THIS_BSP),x86_64 x86))
+	$(MAKE) prepare_bootable
+endif
+
+clean: clean_pdf
+	$(RM) a.out $(TIMESTAMP_OFILE) CONFIG.h sysdevices.h nodetab $(BSP) \
+			lynxos.map $(CONFIG_TBL) $(KDI_NAME) \
+			$(CONF_OFILES);
+ifeq ($(THIS_BSP), x86)
+	$(RM) $(RAW_KDI) $(MULTIBOOT_IMG) $(EFI_IMG);
+	$(MAKE) -C ../gnuefi/ $@
+endif
+ifeq ($(THIS_BSP), x86_64)
+	$(RM) $(RAW_KDI) $(MULTIBOOT_IMG) $(EFI_IMG);
+	$(MAKE) -C ../gnuefi/ $@
+endif
+
+clobber: clobber_pdf
+
+CONFIG.h nodetab sysdevices.h: $(CONFIG_TBL)
+	@$(ECHO)
+	@$(ECHO) Processing $<
+	@$(ECHO)
+	$(KERN_CONFIG) $< CONFIG.h nodetab sysdevices.h $(ENV_PREFIX)/sys/cfg
+
+$(CONFIG_TBL): config.tbl
+	$(M4_CMD) $(M4_FLAGS)  config.tbl > $@
+
+ifeq ($(CODE_COVERAGE_TYPE), obj)
+inszt_conf.s: conf.c conf_kas.h $(UPARAM_H) $(CONF_H) CONFIG.h
+	$(MAKE) update_conf_files -C ${ENV_PREFIX}/usr/local/ldra
+
+inszt_conf_am.s: conf_am.c conf_kas.h $(UPARAM_H)
+	$(MAKE) update_conf_files -C ${ENV_PREFIX}/usr/local/ldra
+
+inszt_info.s: info.c $(UPARAM_H) $(CONF_H)
+	$(MAKE) update_conf_files -C ${ENV_PREFIX}/usr/local/ldra
+endif
+
+conf.o: $(CONF_FILE) conf_kas.h $(UPARAM_H) $(CONF_H) CONFIG.h
+	@$(ECHO)
+	@$(ECHO) Rebuilding $@ ...
+	@$(ECHO)
+	$(KERN_GCC) $(KERN_CFLAGS) $(__KERN_IFLAGS) $(SPECIAL_INCLUDES) -c $< -o $@
+
+conf_am.o: $(CONF_AM_FILE) conf_kas.h $(UPARAM_H)
+	@$(ECHO)
+	@$(ECHO) Rebuilding $@ ...
+	@$(ECHO)
+	$(KERN_GCC) $(KERN_CFLAGS) $(__KERN_IFLAGS) $(SPECIAL_INCLUDES) -c $< -o $@
+
+info.o: $(INFO_FILE) $(UPARAM_H) $(CONF_H)
+	@$(ECHO)
+	@$(ECHO) Rebuilding $@ ...
+	@$(ECHO)
+	$(KERN_GCC) $(KERN_CFLAGS) $(__KERN_IFLAGS) $(SPECIAL_INCLUDES) -c $< -o $@
+
+# Default values
+COMPONENTS = tcpip nfs
+ifeq "$(origin PARSE)" "undefined"
+#
+# Generic target processing, examples:
+#   uninstall.tcpip.ether
+#   install.tcpip.scmp.nfs
+#   install.tcpip.busnet.nfs
+.DEFAULT:
+	$(MAKE) PARSE=Done COMPONENTS="$(filter-out $(word 1,$(subst ., ,$@)),$(subst ., ,$@))" $(word 1,$(subst ., ,$@)).all
+endif
+
+all.all: $(patsubst %,%_install,$(COMPONENTS)) re_all
+install.all: $(patsubst %,%_install,$(COMPONENTS)) re_install
+uninstall.all: $(patsubst %,%_uninstall,$(COMPONENTS)) re_install
+
+# must call make again to read in newly modified configuration
+re_all: $(CONFIG_TBL)
+	$(MAKE) common_all
+
+re_install: CONFIG.h
+	$(MAKE) install
+
+# + : install
+# - : un-install
+%_install %_uninstall:
+	@$(ENV_PREFIX)/sys/bsp/scripts/conf $(BOARD) $@ $(SPEC)
+
+###############################################################################
+###	The following code determines the current system configuration
+###	based on the contents of config.tbl
+###############################################################################
+
+ifeq ($(BUILD_MODE), $(MODE_DEV))
+NFS_CLIENT = $(shell [ -f $(CONFIG_TBL) ] \
+		&& grep -q \^I:nfs.cfg $(CONFIG_TBL) \
+		&& { $(ECHO) -lnfs_client; } \
+		|| { $(ECHO) -lnullnfs; })
+endif
+
+LCS = $(shell [ -f $(CONFIG_TBL) ] \
+		&& grep -q \^I:lcs.cfg $(CONFIG_TBL) \
+		&& $(ECHO) -llcs)
+
+# End of file.

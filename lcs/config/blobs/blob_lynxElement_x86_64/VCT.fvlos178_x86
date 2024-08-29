@@ -1,0 +1,109 @@
+// Cyclic Redundancy Check (CRC) value for this VCT.
+// If VctCrc is empty, VCT CRC checking is disabled.
+VctCrc=;
+
+// vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+// vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+//***************************************************************************
+// (C) Copyright 2023 Lynx Software Technologies, Inc. All rights reserved.
+//***************************************************************************
+
+
+
+
+// The part number of the VCT. The value shall be a 12 to 20
+// character ASCII string that contains the part number.
+// This feature is not supported.
+VctCpn=104-1234-002;
+
+// Version of the VCT. It allows the software to be backwards
+// compatible when the format of the VCT changes.
+// The value shall be a number between 0 and 65535.
+VctVersion=300;
+
+// The number of virtual machines in the VM table.
+// The range is between 1 and 16, inclusive.
+// By default, lcsinfo(sys/drivers.rsc/lcs/drvr) contains data for 1 VM.
+// Please make sure that lcsinfo is updated based on number of VMs defined below.
+NumOfVms=1;
+
+// The number of dynamic device drivers and devices in the DDD table.
+// The range shall be between 0 and 47, inclusive.  A maximum of 32
+// device driver drivers, 16 block devices, and 48 character devices
+// can be installed in this section.
+NumOfDdds=0;
+
+// The number of File Systems in the FS table.
+// The range shall be between 0 and 15, inclusive.
+NumOfFs=0;
+
+<Schedule0>
+	ScheduleName=ColdStart;
+    InitialModuleSchedule=1;
+	Schedule=0[50];
+</Schedule0>
+
+<Schedule1>
+	ScheduleName=WarmStart;
+	Schedule=0[50];
+</Schedule1>
+
+<Schedule2>
+	ScheduleName=RunTime;
+	Schedule=0[50];
+</Schedule2>
+
+////////////////////////////////////////
+// Virtual Machines
+////////////////////////////////////////
+<VM0>
+	GroupIds=2 1 0;
+	LogicalName=System;
+
+
+	CommandLine=/bin/hello;
+
+	EnvironmentVars=VAR1=var1
+	                VAR2=var2;
+
+	StdInNodeFname=/dev/console;
+	StdOutNodeFname=/dev/console;
+	StdErrNodeFname=/dev/console;
+
+	WorkingDir=/;
+	RamFsMount=/tmp;
+	RamFsLim=314572800;
+	RamFsNumOfInodes=200;
+	SysRamMemLim=4294967296;
+
+	ActionOnVmErr=0;
+	ActionOnSigillExcp=Override;
+	ActionOnSigfpeExcp=Override;
+	ActionOnSigsegvExcp=Override;
+	ActionOnSigbusExcp=Override;
+	NumOfProcessesLim=15;
+	NumOfThreadsLim=30;
+	NumOfTimersLim=4;
+	FsCacheLim=4194304;
+	FsCacheAttr=WriteThrough;
+	FsNumOfInodesLim=150;
+	FsNumOfRecordLocksLim=60;
+	NumOfOpenFdsPerVmLim=150;
+	NumOfMsgQueuesLim=10;
+	NumOfPipesLim=80;
+	NumOfSignalsLim=30;
+	NumOfSharedMemObjsLim=10;
+	NumOfSemaphoresLim=30;
+	NumOfUnixStreamSockLim=5;
+
+	//NicDeviceNode0=/dev/lcs_em0;
+	// NicDeviceNode0=/dev/virtio_nic0;
+	//NicDeviceNode1=/dev/ixgbepf0;
+	//NicDeviceNode2=/dev/ixgbevf0;
+	//NicDeviceNode3=/dev/ixgbevf1;
+	//NicDeviceNode4=/dev/ixgbevf2;
+	SetModuleSchedule=1;
+	ScheduleChangeAction=IGNORE;
+</VM0>
+
+// End of file.

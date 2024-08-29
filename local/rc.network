@@ -1,0 +1,142 @@
+#!/bin/sh
+
+# A little start up routine to capture errors.
+start_it()
+{
+	echo "Running $1"
+	echo "[$@]"
+	$@ || echo "    failed with exit code $?"
+}
+
+ENABLE_IPV6=false
+INIT_NETWORK=true
+if [ "$INIT_NETWORK" = "true" ]; then
+  INTERACTIVE_RCNETWORK=true
+
+  network_interface=blank
+  ip_address=blank
+  route_address=blank
+  ipv6_address=blank
+  ipv6_prefix=blank
+  if [ "$INTERACTIVE_RCNETWORK" = "true" ]; then
+    if ! [ -a /tmp/net_started ]; then
+        echo ""
+        echo "This KDI interactively prompts for machine IP."
+        echo "See /net/rc.network for details ..."
+        echo ""
+        echo -n "Please enter network interface name: "
+        read ans
+        if [ ! "$ans" = "" ]; then
+            network_interface=$ans
+        fi
+        echo -n "Please enter networking IP address [$ip_address]: "
+        read ans
+        if [ ! "$ans" = "" ]; then
+            ip_address=$ans
+        fi
+        echo -n "Please enter router IP address [$route_address]: "
+        read ans
+        if [ ! "$ans" = "" ]; then
+            route_address=$ans
+        fi
+        if [ "$ENABLE_IPV6" = "true" ]; then
+            echo "Please enter networking IPv6 address "
+            echo -n "[e.g. 2001:0db8:4672:6565:2026:5044:2d44:5344]: "
+            read ipv6_address
+            echo -n "Please enter network prefix [e.g. 64]: "
+            read ipv6_prefix
+        fi
+        echo ""
+      fi
+   fi
+fi
+
+INIT_LOCI=true
+if [ "$INIT_LOCI" = "true" ]; then
+  INTERACTIVE_LOCI=true
+
+  if [ ! "$INTERACTIVE_LOCI" = "true" ]; then
+    # CUSTOMIZE THE FOLLOWING LINE SO THAT IT USES YOUR LOCI ARGUMENTS:
+    loci_args="customize"
+  else
+    if ! [ -a /tmp/loci_started ]; then
+        while true; do
+            echo -n "Please enter type of connection with LOCI target server (s/n) [n]:"
+            read ans
+            if [ "$ans" = "" -o "$ans" = "s" -o "$ans" = "n" ]; then
+                break
+            fi
+        done
+
+        loci_args="-D"
+        if [ "$ans" = "s" ]; then
+            dev=/dev/com1
+            baudrate=19200
+            echo -n "Please enter device name [$dev]:"
+            read ans
+            if [ "$ans" != "" ]; then
+                dev=$ans
+            fi
+            echo -n "Please enter baud rate [$baudrate]:"
+            read ans
+            if [ "$ans" != "" ]; then
+                baudrate=$ans
+            fi
+            loci_args="-d $dev -s $baudrate -D"
+        else
+            if [ "$ENABLE_IPV6" = "true" ]; then
+                while true; do
+                    echo -n "Please enter IP version to use by LOCI server (4/6) [6]:"
+                    read ans
+                    if [ "$ans" = "" -o "$ans" = "4" -o "$ans" = "6" ]; then
+                        break
+                    fi
+                done
+                if [ "$ans" = "6" -o "$ans" = "" ]; then
+                    loci_args="-u -6 -D"
+                fi
+            fi
+        fi
+    fi
+  fi
+fi
+
+cd /net
+
+if [ "$INIT_NETWORK" = "true" ]; then
+  if ! [ -a /tmp/net_started ]; then
+    start_it /bin/ifconfig $network_interface $ip_address up
+    if [ -n "$route_address" ]; then
+      start_it route add default $route_address
+    fi
+    if [ "$ENABLE_IPV6" = "true" ]; then
+      start_it /bin/ifconfig $network_interface inet6 $ipv6_address/$ipv6_prefix up
+    fi
+    [ -x /net/inetd ] && start_it /net/inetd
+    echo -n "" > /tmp/net_started
+  fi
+fi
+
+if [ "$INIT_LOCI" = "true" ]; then
+  if ! [ -a /tmp/loci_started ]; then
+    cd /usr/loci/bin
+    if ! drivers | grep loci >/dev/null; then
+      start_it ./loci_install
+      chmod a+w /tmp/loci
+    else
+      if [ -e /dev/loci ]; then
+          loci_args="$loci_args -l /dev/loci"
+      else
+          if [ -e /dev/ddev/loci0 ]; then
+              loci_args="$loci_args -l /dev/ddev/loci0"
+          fi
+      fi
+    fi
+    start_it ./lwsrvr $loci_args
+    cd -
+    echo -n "" > /tmp/loci_started
+  fi
+fi
+
+# Source a local script
+[ -x /net/rc.local ] && . /net/rc.local

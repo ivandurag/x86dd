@@ -1,0 +1,155 @@
+# vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+# vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+#****************************************************************************
+# (C) Copyright 2023-2024 Lynx Software Technologies, Inc. All rights reserved.
+#****************************************************************************
+#
+# INFORMATION SUBJECT TO EXPORT CONTROL LAWS
+#
+# Subject to local country rules and laws when applicable, you must
+# comply with the following:
+#
+# 'These commodities, technology, or software were exported from the
+# United States in accordance with the Export Administration
+# Regulations.  Diversion contrary to U. S. law and other relevant
+# export controls is prohibited.   They may not be re-exported to any
+# of the following destinations without authorization; Cuba, Iran,
+# Iraq, Libya, North Korea, Sudan or any other country to which
+# shipment is prohibited; nor to end-use(r)s involved in chemical,
+# biological, nuclear, or missile weapons activity.'
+#
+# COPYRIGHT NOTICE:
+#   (C) Copyright 2000-2002 Rockwell Collins, Inc. All rights reserved.
+#
+# FILE NAME:
+#   config.tbl
+#
+# PURPOSE:
+#   Device/driver configuration table.
+#
+# NOTES: None.
+#
+# ABBREVIATIONS/ACRONYMS: None.
+#
+#############################################################################
+#
+#	LynxOS device/driver configuration table
+#
+#	Format:
+#
+#	C:driver-name:open:close:read:write:select:control:install:uninstall
+#	D:device-name:info-block-name:raw-partner-name
+#	N:node-name:minor-dev
+#	S:special-name:minor-dev
+#	I:filename
+#	n:nodetab line
+#
+#	Use "B" instead of "C" for block drivers.
+#	"n" lines are usually for symbolic links.
+#	Omitted routines in driver lines are assumed to be "ionull"
+#
+#	Most of the real beef is in the included .cfg files
+#
+#############################################################################
+
+dnl # This file is processed by the m4 macro processor.
+
+changequote(",")
+
+I:lsk_helper.cfg
+I:null.cfg
+
+# mem device driver.
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:mem.cfg
+")
+
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:tty.cfg
+")
+I:tty_16550.cfg
+n:console:@com1::
+n:skdb_console:@com1::
+
+# Enable for physical LPSS serial console
+#I:tty_lpss.cfg
+#n:console:@lpss_com1::
+#n:skdb_console:@lpss_com1::
+
+# RAM disk configuration.
+I:rd.cfg
+
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:pty.cfg
+")
+
+# Generator of pseudo-random numbers
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:rnd.cfg
+")
+
+I:lcs.cfg
+I:lcs_em.cfg
+I:lcs_igc.cfg
+I:ixgbepf.cfg
+# The Virtual Function driver is not supported in the fully virtualized
+# version of LynxOS-178 at this time. It requires additional support from DRM.
+# I:ixgbevf.cfg
+I:virtio_net.cfg
+
+# Debug driver
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:ptrace.cfg
+","
+# Disabled by default in PDN mode
+I:ptrace.cfg
+")
+
+# NFS Support.
+ifdef("VMOS_NFS","
+I:nfs.cfg
+")
+
+# USB device drivers.
+# Disable USB in unikernel and production mode per default
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:usb.cfg
+I:usb_ehci_x86.cfg
+I:usb_xhci_x86.cfg
+I:simusb.cfg
+")
+
+# ARINC653 device driver
+ifelse(BUILD_MODE,UNIKERNEL,"","
+I:arinc653.cfg
+")
+
+# MMAP driver
+ifelse(BUILD_MODE,UNIKERNEL,"","
+I:mmap.cfg
+")
+
+# AHCI driver
+I:ahci.cfg
+
+# LSK FIFO support
+I:lsk_fifo_pci.cfg
+
+# Health Monitor device driver
+ifelse(BUILD_MODE,UNIKERNEL,"","
+I:hm.cfg
+")
+
+# VMOS pseudo device driver
+ifelse(BUILD_MODE,UNIKERNEL,"","
+I:vmos.cfg
+")
+
+ifelse(BUILD_MODE,DEVELOPMENT,"
+I:lfatfs.cfg
+")
+
+# End of file.
+
+# Simple character driver
+#I:dd.cfg

@@ -1,0 +1,80 @@
+Overview
+========
+Blobs allow building one KDI to be used with multiple Subjects.
+Please see the LCS User's Guide for more information on blobs.
+
+Each Subject in a blob will have 3 files:
+
+1. VCT.<Subject> this originates from the VCT file under sys/bsp.x86_64.
+2. <Subject>.spec.in allows the user to add files to the Subject file system
+and can be acesses from the path /usr/local when Subject boots.
+3. <Subject>.c this is the equivalent of lcsinfo.c that houses the networking
+stack interface configuration.
+
+In this directory the user can create multiple blobs to build images for
+different hardware platform. These blobs can scale, one can create a new
+blob directory and call it "xyz". It doesn't have to be in the form
+"blob_dev_x86_64",  blob here is provided as an example.
+
+To create a new blob, create a new directory and copy an existing blob to it.
+Change Subject names as desired. Add remove Subjects as needed.
+
+To build a blob:
+
+```
+$ build.sh <blob directory name>
+```
+
+Blob example for x86_64 in Development
+======================================
+
+a. Layout
+
+blob_dev_x86_64
+├── fvlos178_x86.c       : FV los178 x86 LCS configuration
+├── fvlos178_x86.spec.in : FV los178 x86 spec allows the user to add files/directory
+├── lynxos-178.spec      : This is $ENV_PREFIX/sys/bsp.x86_64/lynxos-178.spec that is updated for blob
+├── README               : Instruction
+├── runme.sh             : Additional file to the FV los178 that configure the network from /usr/local/blob-bin/
+└── VCT.fvlos178_x86     : FV los178 x86 VCT configuration with 4GB ram and network lcs_em 
+
+b. Build a blob
+
+```
+$ cd $ENV_PREFIX/sys/drivers.rsc/lcs/config/blobs
+$ ./build.sh ./blob_dev_x86_64
+```
+It will generate the $ENV_PREFIX/sys/drivers.rsc/lcs/config/blobs/localfs_images/localfs.fvlos178_x86.img
+
+c. Update the BSP spec file to disable "/usr/local/etc/VCT"
+
+Update $ENV_PREFIX/sys/bsp.x86_64/lynxos-178.spec and rebuild BSP
+
+from
+
+	directory=/usr/local/etc                        owner=0 group=0 mode=drwxr-xr-x
+	file=VCT source=./VCT                          owner=0 group=0 mode=-rw-r--r--
+
+to
+	directory=/usr/local/etc                        owner=0 group=0 mode=drwxr-xr-x
+	#file=VCT source=./VCT                          owner=0 group=0 mode=-rw-r--r--
+
+```
+$ cd $ENV_PREFIX/sys/bsp.x86_64
+$ make clean all
+```
+It will generate the Kernel Development Image (KDI) as $ENV_PREFIX/sys/bsp.x86_64/lynxos-178.efi
+
+d.  Build the LynxSecure SRP
+
+TARGET=denverton
+LOS178PATH=/tmp/x86/dev
+BLOBSPATH=$LOS178PATH/sys/drivers.rsc/lcs/config/blobs/blob_dev_x86_64/localfs_images
+KDIPATH=$LOS178PATH/sys/bsp.x86_64/lynxos-178.efi
+autoconfig mksrp $TARGET  \
+--subject-vds0=SERIAL*,loginconsoles="tty0:ttyS0",NET1 \
+--subject-fvlos178=ram=6g,boottimeout=10,virtlpc, \
+fwpath=${ENV_PREFIX}/x86_64/libexec/OVMF.fd,virtuart,NET0, \
+kdipath=$KDIPATH,guestimage=localfs.fvlos178_1:$BLOBSPATH/localfs.fvlos178_x86.img
+
+e. Follow Board Supported Guide on how to boot up the LynxSecure SRP

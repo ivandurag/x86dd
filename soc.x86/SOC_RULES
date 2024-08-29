@@ -1,0 +1,13 @@
+# vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+# vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+#****************************************************************************
+# (C) Copyright 2021-2024 Lynx Software Technologies, Inc. All rights reserved.
+#****************************************************************************
+
+include $(ENV_PREFIX)/ENVIRONMENT
+
+include $(ENV_PREFIX)/sys/csp.x86_64/CSP_RULES
+
+THIS_SOC = x86
+
+# End of file.

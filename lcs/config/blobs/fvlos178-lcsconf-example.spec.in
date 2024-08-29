@@ -1,0 +1,16 @@
+#target=aarch64
+target=x86_64
+
+directory=/
+file=lcsconfig.img source=$(ENV_PREFIX)/sys/drivers.rsc/lcs/config/blobs/img/LCSBLOB owner=0 group=0 mode=-rw-r--r--
+
+directory=/etc
+ file=VCT source=$(ENV_PREFIX)/sys/drivers.rsc/lcs/config/blobs/LCSVCT owner=0 group=0 mode=-rw-r--r--
+
+
+# One can add files to the blobs Sbuject, example below it they are
+# placed under /temp directory under config/blobs/temp
+
+#directory=/binaries
+# file=file_1 source=temp/file_1 owner=0 group=0 mode=-rw-r--r--
+# file=file_2 source=temp/file_2 owner=0 group=0 mode=-rw-r--r--

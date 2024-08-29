@@ -1,0 +1,129 @@
+# vi: set ai ts=4 sw=4 : -*-  tab-width:4  c-basic-offset:4   -*-
+# vim: set comments= cinoptions=\:0,t0,+8,c4,C1 :
+#****************************************************************************
+# (C) Copyright 2023 Lynx Software Technologies, Inc. All rights reserved.
+#****************************************************************************
+
+#***********************************************************************
+# INFORMATION SUBJECT TO EXPORT CONTROL LAWS
+#
+# Subject to local country rules and laws when applicable, you must
+# comply with the following:
+#
+# 'These commodities, technology, or software were exported from the
+# United States in accordance with the Export Administration
+# Regulations.  Diversion contrary to U. S. law and other relevant
+# export controls is prohibited.   They may not be re-exported to any
+# of the following destinations without authorization; Cuba, Iran,
+# Iraq, Libya, North Korea, Sudan or any other country to which
+# shipment is prohibited; nor to end-use(r)s involved in chemical,
+# biological, nuclear, or missile weapons activity.'
+#
+# COPYRIGHT NOTICE:
+#   (C) Copyright 2000 Rockwell Collins, Inc.  All rights reserved.
+#***********************************************************************
+
+# BSP rules for x86 (X86).
+
+SOC_PATH = $(ENV_PREFIX)/sys/soc.x86
+
+include $(ENV_PREFIX)/ENVIRONMENT
+
+THIS_BSP = x86_64
+
+include $(SOC_PATH)/SOC_RULES
+
+BOOT_DEBUG = false
+DEBUG = false
+
+vpath bsp_kputc.c $(SOC_PATH)
+vpath drm_conf.c $(SOC_PATH)
+vpath sysctl_list.c $(SOC_PATH)
+vpath %.S $(SOC_PATH)
+
+ifeq ($(BUILD_MODE), $(MODE_DEV))
+	BSP_INC_PATH = $(KERN_INC_PATH)/bsps/$(THIS_BSP)
+else
+	BSP_INC_PATH = $(KERN_INC_PATH_RSC)/bsps/$(THIS_BSP)
+endif
+SPECIAL_INCLUDES += -I$(BSP_INC_PATH)
+BSP_LIBRARIES = -lfamily_$(THIS_FAM) -lcsp_$(THIS_CSP)
+BSP_CFLAGS = -D__$(THIS_BSP)__ -D__drm__
+
+# The ALLOW_NO_UART_AUTO flag allows automatic turn-off of the
+# console device if failure occures during initialization.
+# With ALLOW_NO_UART_AUTO flag set the OS will be booted normally
+# without any console in case of console initialization failure.
+BSP_CFLAGS += -DALLOW_NO_UART_AUTO
+
+ifeq ($(BOOT_DEBUG), true)
+	BSP_CFLAGS += -DBOOT_DEBUG
+endif
+ifeq ($(DEBUG), true)
+	BSP_CFLAGS += -DDEBUG
+endif
+
+
+ifeq ($(KERNEL_IS_INSTRUMENTED), yes)
+	ifeq ($(CODE_COVERAGE_TYPE), src)
+		SPECIAL_CFLAGS_bsp_kputc = -DVCAST_DUMP_COVERAGE
+		SPECIAL_CFLAGS_bsp_reboot = -DVCAST_DUMP_COVERAGE
+		SPECIAL_CFLAGS_bsp_relocate = -DVCAST_INSTRUMENTED
+	else
+		SPECIAL_CFLAGS_bsp_kputc = -DLDRA_DUMP_COVERAGE
+		SPECIAL_CFLAGS_bsp_reboot = -DLDRA_DUMP_COVERAGE
+		SPECIAL_CFLAGS_bsp_relocate = -DLDRA_INSTRUMENTED
+	endif
+
+	SPECIAL_CFLAGS_bsp_env_am_uninstrumented = \
+		-Dmemset=memset_uninstrumented \
+		-Dbsp_init_kenv=bsp_init_kenv_uninstrumented
+
+	SPECIAL_CFLAGS_bsp_init_am_uninstrumented = \
+		-Dbsp_init_kenv=bsp_init_kenv_uninstrumented \
+		-Dkas_pre_init_common=kas_pre_init_common_uninstrumented \
+		-Dbsp_pre_init=bsp_pre_init_uninstrumented \
+		-Dbsp_map_io=bsp_map_io_uninstrumented
+
+	SPECIAL_CFLAGS_bsp_lowInit_uninstrumented = \
+		-Dmemset=memset_uninstrumented \
+		-Dbsp_lowInit=bsp_lowInit_uninstrumented \
+		-DlowInit=lowInit_uninstrumented
+
+	SPECIAL_CFLAGS_bsp_map_fs_uninstrumented = \
+		-Dbsp_map_usr_fs=bsp_map_usr_fs_uninstrumented \
+		-Dbsp_map_local_fs=bsp_map_local_fs_uninstrumented
+
+	SPECIAL_CFLAGS_bsp_relocate_uninstrumented = \
+		-DUNINSTRUMENTED=1 \
+		-DROMk=global_ROMk \
+		-Dmemcpy=memcpy_uninstrumented \
+		-Dmemmove=memmove_uninstrumented \
+		-Dmemset=memset_uninstrumented \
+		-Dbsp_get_timebase=bsp_get_timebase_uninstrumented \
+		-Dget_tea=get_tea_uninstrumented \
+		-Dkas_get_osbase_ea=kas_get_osbase_ea_uninstrumented \
+		-Dkas_get_osbase_size_ea=kas_get_osbase_size_ea_uninstrumented \
+		-Dbsp_move_sections=bsp_move_sections_uninstrumented \
+		-Dbsp_fill_kdi=bsp_fill_kdi_uninstrumented \
+		-Dbsp_verify_kdi=bsp_verify_kdi_uninstrumented \
+		-Dbsp_relocate=bsp_relocate_uninstrumented
+
+	SPECIAL_CFLAGS_bsp_timer_am_uninstrumented = \
+		-Dbsp_get_timebase=bsp_get_timebase_uninstrumented
+
+	SPECIAL_CFLAGS_conf_am_uninstrumented = \
+		-Dkstack_size_get=kstack_size_get_uninstrumented \
+		-Dkas_get_osbase_ea=kas_get_osbase_ea_uninstrumented \
+		-Dkas_get_osbase_size_ea=kas_get_osbase_size_ea_uninstrumented \
+		-Dkas_pre_init_common=kas_pre_init_common_uninstrumented \
+		-Dkstack_top_get=kstack_top_get_uninstrumented
+
+	SPECIAL_CFLAGS_entry_uninstrumented = \
+		-D_start=_start_uninstrumented \
+		-Dbsp_relocate=bsp_relocate_uninstrumented
+
+	SPECIAL_CFLAGS_entry = -DNO_KBOOT0=1
+endif # KERNEL_IS_INSTRUMENTED = yes
+
+# End of file.
