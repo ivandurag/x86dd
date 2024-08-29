@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<driver addTest="false" link="dynamic" name="dd" sample="char">
+<source name="dddrvr.c"/>
+<header name="dddrvr.h"/>
+</driver>

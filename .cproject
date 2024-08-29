@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.lnxw.luminosity.stdmake.toolchain.debug.1294951903">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.lnxw.luminosity.stdmake.toolchain.debug.1294951903" moduleId="org.eclipse.cdt.core.settings" name="LynxOS-178_2024.07.0_x86_64_x86_64_Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="dd" buildProperties="" id="com.lnxw.luminosity.stdmake.toolchain.debug.1294951903" name="LynxOS-178_2024.07.0_x86_64_x86_64_Debug" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.lnxw.luminosity.stdmake.toolchain.debug.1294951903.1538560577" name="/" resourcePath="">
+						<toolChain id="com.lnxw.luminosity.stdmake.toolchain.debug.524237139" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="com.lnxw.luminosity.stdmake.toolchain.debug">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.GNU_ELF" id="com.lnxw.luminosity.stdmake.toolchain.debug.1294951903.2096303070" name=""/>
+							<builder enableAutoBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.2138239356" managedBuildOn="false" name="Gnu Make Builder.LynxOS-178_2024.07.0_x86_64_x86_64_Debug" superClass="org.eclipse.cdt.build.core.settings.default.builder">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="x86_64_Debug"/>
+								</outputEntries>
+							</builder>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1007815687" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
+							<tool id="com.lnxw.luminosity.settings.holder.cpp.1206526647" name="GNU C++" superClass="com.lnxw.luminosity.settings.holder.cpp">
+								<inputType id="com.lnxw.luminosity.settings.holder.inTypecpp.78196520" superClass="com.lnxw.luminosity.settings.holder.inTypecpp"/>
+							</tool>
+							<tool id="com.lnxw.luminosity.settings.holder.c.1073288005" name="GNU C" superClass="com.lnxw.luminosity.settings.holder.c">
+								<inputType id="com.lnxw.luminosity.settings.holder.inTypec.459507683" superClass="com.lnxw.luminosity.settings.holder.inTypec"/>
+							</tool>
+							<tool id="com.lnxw.luminosity.settings.holder.asm.2008669729" name="Assembly" superClass="com.lnxw.luminosity.settings.holder.asm">
+								<inputType id="com.lnxw.luminosity.settings.holder.inTypeasm.1072399714" superClass="com.lnxw.luminosity.settings.holder.inTypeasm"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.lnxw.luminosity.stdmake.toolchain.release.892593802">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.lnxw.luminosity.stdmake.toolchain.release.892593802" moduleId="org.eclipse.cdt.core.settings" name="LynxOS-178_2024.07.0_x86_64_x86_64_Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="dd" buildProperties="" id="com.lnxw.luminosity.stdmake.toolchain.release.892593802" name="LynxOS-178_2024.07.0_x86_64_x86_64_Release" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.lnxw.luminosity.stdmake.toolchain.release.892593802.1293559875" name="/" resourcePath="">
+						<toolChain id="com.lnxw.luminosity.stdmake.toolchain.release.1045438220" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="com.lnxw.luminosity.stdmake.toolchain.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.GNU_ELF" id="com.lnxw.luminosity.stdmake.toolchain.release.892593802.19771417" name=""/>
+							<builder enableAutoBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.2140731727" managedBuildOn="false" name="Gnu Make Builder.LynxOS-178_2024.07.0_x86_64_x86_64_Release" superClass="org.eclipse.cdt.build.core.settings.default.builder">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="x86_64_Release"/>
+								</outputEntries>
+							</builder>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.569812477" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
+							<tool id="com.lnxw.luminosity.settings.holder.cpp.542982752" name="GNU C++" superClass="com.lnxw.luminosity.settings.holder.cpp">
+								<inputType id="com.lnxw.luminosity.settings.holder.inTypecpp.838032706" superClass="com.lnxw.luminosity.settings.holder.inTypecpp"/>
+							</tool>
+							<tool id="com.lnxw.luminosity.settings.holder.c.187863187" name="GNU C" superClass="com.lnxw.luminosity.settings.holder.c">
+								<inputType id="com.lnxw.luminosity.settings.holder.inTypec.626185443" superClass="com.lnxw.luminosity.settings.holder.inTypec"/>
+							</tool>
+							<tool id="com.lnxw.luminosity.settings.holder.asm.1448173188" name="Assembly" superClass="com.lnxw.luminosity.settings.holder.asm">
+								<inputType id="com.lnxw.luminosity.settings.holder.inTypeasm.1085701954" superClass="com.lnxw.luminosity.settings.holder.inTypeasm"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="dd.null.823467305" name="dd"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.lnxw.luminosity.stdmake.toolchain.debug.1294951903">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.lnxw.luminosity.GCCStandardMakePerProjectProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.lnxw.luminosity.stdmake.toolchain.release.892593802">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.lnxw.luminosity.GCCStandardMakePerProjectProfile"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="driver" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>driver</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+		</buildTargets>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+</cproject>

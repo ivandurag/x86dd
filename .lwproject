@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<lynuxworks-project external="false" format="elf" os="LynxOS-178" type="loskernel">
+<base-configurations>
+<configuration name="LynxOS-178">
+<cflags value=""/>
+<ccflags value=""/>
+<assemebler-flags value=""/>
+<linker-flags value=""/>
+<libraries value=""/>
+</configuration>
+</base-configurations>
+<loskernel args="" binary="" bootfile="" buildkdi="true" copydeveloper="true" copyfile="" debug="false" diskdevice="" enableipv6="false" hostipv6="" hostmac="" initLoci="true" initNetwork="true" interactiveloci="true" interactivenetwork="true" ipaddress="" ipv6="" kdiname="dd.kdi" kditype="kdi" lcsdriver="virtio_net" loci="true" lociIpVer="IPv4" locibaudrate="19200" locidevice="/dev/com1" lociserial="false" mac="" needcmdprj="false" networkinterface="lcs0" prefix="64" router="" specname="dd.spec" spyker="false" spykercmdfile="" ssh="false" template="custom" templateselected="true" verbose="false"/>
+<lcsconfig>
+<vm ipDefaultTTL="64" ipForwardingEnabled="true" ipFragQueueSize="1024" ipFragWaitForTimeout="5" numOfMcastEntries="2048" numOfSockets="256" recvPollingEnabled="true" sockDefaultRxBufSize="128" sockDefaultTxBufSize="128">
+<interface mcastpf="false" mtu="1500" numOfRxRings="1" numOfTxRings="1" perIfIorbPoolSize="4096" prefix="64" rxRingSize="256" rx_budget="256" selfIpv4="10.20.31.3" selfIpv4Broadcast="10.20.31.255" selfIpv4Mask="255.255.255.0" selfIpv6="" selfMac="" txRingSize="256" txThreshold="32" tx_budget="256">
+<peer gateway="true" ip="2001:0db8:4672:6565:2036:5044:2d44:5346" loci="true" mac="de:ad:be:ef:fe:ed" prefix="64"/>
+</interface>
+</vm>
+</lcsconfig>
+</lynuxworks-project>
